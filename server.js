@@ -14,7 +14,7 @@ function writeInput(query, callback) {
         return console.log(err);
     }
     console.log('The file was saved!');
-    callback();
+    callback(null);
   }); 
 }
 
@@ -25,16 +25,15 @@ function convertFormat(callback) {
       return callback(error);
       console.log('exec error: ' + error);
     }
-    callback();
+    callback(null);
   });
 }
 
 function predict(callback) {
-  var svmPredict = 'libsvm-3.20/svm-predict';
+  var svmPredict = 'libsvm/svm-predict';
   var output = 'output/output';
   var input = 'input.t';
-  var trainingModel = 'libsvm-3.20/training'; // prefix
-  console.log('hi trying to predict');
+  var trainingModel = 'libsvm/training/training'; // prefix
   var count = 0;
   for (var i = 0; i < 10; i++) {
     exec('./' + svmPredict + ' -b 1 ' + input + ' ' + trainingModel + i + '.model'
@@ -46,7 +45,7 @@ function predict(callback) {
       console.log('Count: ' + count)
 
       if (count == 10) {
-        callback();
+        callback(null);
       }
       if (error !== null) {
         return callback(error);
@@ -58,48 +57,58 @@ function predict(callback) {
 
 function readOutput(callback) {
   var count = 0;
+  var response = '';
   for (var i = 0; i < 10; i++) {
     var fileName = 'output/output' + i;
     var contents = fs.readFileSync(fileName,'utf8');
     var lines = contents.split('\n');
     var percentages = lines[1].split(' ');
-    console.log(emotions[i] + ': ' + percentages[1]);
     count += 1;
     if (count == 10) {
-      callback();
+      response += emotions[i] + '=' + percentages[1];
+      callback(null, response);
+    } else {
+      response += emotions[i] + '=' + percentages[1] + '&';
     }
   }
 }
 
 app.get('/', function (req, res) {
   var query = req.query.query;
-  
   if (query !== undefined) {
     async.series([
       function(callback) {
-        console.log('FIRST TASK: Saving query to file');
         writeInput(query, callback);
       },
       function(callback) {
-        console.log('SECOND TASK: Converting to LIBSVM');
         convertFormat(callback);
       },
       function(callback) {
-        console.log('THIRD TASK: Running LIBSVM Predictions');
         predict(callback);
       }, 
       function(callback) {
-        console.log('FOURTH TASK: Ready to start reading prediction percentages');
         readOutput(callback);
       }
-    ]);
+    ],
+    function(err, results) {
+      var output = '';
+      percentages = results[3].split('&');
+      for (var i = 0; i < percentages.length; i++) {
+        var line = percentages[i].split('=');
+        output += line[0] + ': ' + line[1] + '<br>';
+      }
+      res.send(query + '<br><br>' + output);
+    }
+    );
   }
 
-  res.send(query);
+
+  
 });
 
 var server = app.listen(3000, function () {
-  var host = server.address().address;
+  //var host = server.address().address;
+  var host = '45.55.241.129';
   var port = server.address().port;
   console.log('listening at http://%s:%s', host, port);
 });
