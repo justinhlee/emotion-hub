@@ -66,6 +66,7 @@ function readOutput(callback) {
     count += 1;
     if (count == 10) {
       response += emotions[i] + '=' + percentages[1];
+      console.log(response);
       callback(null, response);
     } else {
       response += emotions[i] + '=' + percentages[1] + '&';
@@ -87,16 +88,19 @@ app.get('/', function (req, res) {
         predict(callback);
       }, 
       function(callback) {
+        console.log('reading output now');
         readOutput(callback);
       }
     ],
     function(err, results) {
       var output = '';
+      /*
       percentages = results[3].split('&');
       for (var i = 0; i < percentages.length; i++) {
         var line = percentages[i].split('=');
         output += line[0] + ': ' + line[1] + '<br>';
       }
+      */
       res.send(query + '<br><br>' + output);
     }
     );
