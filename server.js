@@ -79,29 +79,34 @@ app.get('/', function (req, res) {
   if (query !== undefined) {
     async.series([
       function(callback) {
+        console.log('First: Writing input');
         writeInput(query, callback);
       },
       function(callback) {
+        console.log('Second: converting to SVM format');
         convertFormat(callback);
       },
       function(callback) {
+        console.log('Third: predicting');
         predict(callback);
       }, 
       function(callback) {
-        console.log('reading output now');
+        console.log('Fourth: reading output');
         readOutput(callback);
       }
     ],
     function(err, results) {
       var output = '';
-      console.log(results)
-      /*
-      percentages = results[3].split('&');
-      for (var i = 0; i < percentages.length; i++) {
-        var line = percentages[i].split('=');
-        output += line[0] + ': ' + line[1] + '<br>';
+      console.log(results);
+      console.log(err);
+      if (err == null) {
+        percentages = results[3].split('&');
+        for (var i = 0; i < percentages.length; i++) {
+          var line = percentages[i].split('=');
+          output += line[0] + ': ' + line[1] + '<br>';
+        }
       }
-      */
+      
       res.send(query + '<br><br>' + output);
     }
     );
@@ -112,8 +117,8 @@ app.get('/', function (req, res) {
 });
 
 var server = app.listen(3000, function () {
-  //var host = server.address().address;
-  var host = '45.55.241.129';
+  var host = server.address().address;
+  //var host = '45.55.241.129';
   var port = server.address().port;
   console.log('listening at http://%s:%s', host, port);
 });
