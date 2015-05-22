@@ -94,6 +94,7 @@ app.get('/', function (req, res) {
     ],
     function(err, results) {
       var output = '';
+      console.log(results)
       /*
       percentages = results[3].split('&');
       for (var i = 0; i < percentages.length; i++) {
