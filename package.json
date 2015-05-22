@@ -1,0 +1,24 @@
+{
+  "name": "emotion-hub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/justinhlee/emotion-hub.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/justinhlee/emotion-hub/issues"
+  },
+  "homepage": "https://github.com/justinhlee/emotion-hub",
+  "dependencies": {
+    "async": "^1.0.0",
+    "express": "^4.12.4"
+  }
+}
