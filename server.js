@@ -30,10 +30,10 @@ function convertFormat(callback) {
 }
 
 function predict(callback) {
-  var svmPredict = 'libsvm/svm-predict';
+  var svmPredict = '../libsvm/svm-predict';
   var output = 'output/output';
   var input = 'input.t';
-  var trainingModel = 'libsvm/training/training'; // prefix
+  var trainingModel = 'Training/training'; // prefix
   var count = 0;
   for (var i = 0; i < 10; i++) {
     exec('./' + svmPredict + ' -b 1 ' + input + ' ' + trainingModel + i + '.model'
@@ -43,7 +43,6 @@ function predict(callback) {
       // Keeping track of which models finished
       count += 1;
       console.log('Count: ' + count)
-
       if (count == 10) {
         callback(null);
       }
@@ -97,23 +96,19 @@ app.get('/', function (req, res) {
     ],
     function(err, results) {
       var output = '';
-      console.log(results);
-      console.log(err);
       if (err == null) {
         percentages = results[3].split('&');
         for (var i = 0; i < percentages.length; i++) {
           var line = percentages[i].split('=');
           output += line[0] + ': ' + line[1] + '<br>';
         }
+      } else {
+        console.log('Error in final callback: ' + err);
       }
-      
       res.send(query + '<br><br>' + output);
     }
     );
   }
-
-
-  
 });
 
 var server = app.listen(3000, function () {
